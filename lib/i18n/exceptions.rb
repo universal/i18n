@@ -94,12 +94,36 @@ module I18n
     include MissingTranslation::Base
   end
 
-  class InvalidPluralizationData < ArgumentError
-    attr_reader :entry, :count
-    def initialize(entry, count)
-      @entry, @count = entry, count
-      super "translation data #{entry.inspect} can not be used with :count => #{count}"
+  class InvalidPluralization
+    module Base
+      attr_reader :locale, :entry, :count
+
+      def initialize(locale, entry, count)
+        @locale, @entry, @count = locale, entry, count
+      end
+
+      def html_message
+        entry_html = CGI.escapeHTML self.entry.inspect
+        count_html = CGI.escapeHTML self.count
+        %(<span class="invalid_pluralization" title="invalid_pluralization">translation data #{entry_html} can not be used with :count => #{count_html}</span>)
+      end
+
+      def message
+        "#{locale}: translation data #{entry.inspect} can not be used with :count => #{count}"
+      end
+      alias :to_s :message
+
+      def to_exception
+        InvalidPluralizationData.new(locale, entry, count)
+      end
     end
+
+    include Base
+  end
+
+
+  class InvalidPluralizationData < ArgumentError
+    include InvalidPluralization::Base
   end
 
   class MissingInterpolationArgument < ArgumentError

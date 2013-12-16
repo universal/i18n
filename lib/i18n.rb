@@ -157,7 +157,7 @@ module I18n
           backend.translate(locale, key, options)
         end
       end
-      result.is_a?(MissingTranslation) ? handle_exception(handling, result, locale, key, options) : result
+      [MissingTranslation, InvalidPluralization].any? {|e| result.is_a? e} ? handle_exception(handling, result, locale, key, options) : result
     end
     alias :t :translate
 
