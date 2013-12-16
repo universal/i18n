@@ -140,7 +140,8 @@ module I18n
 
           key = :zero if count == 0 && entry.has_key?(:zero)
           key ||= count == 1 ? :one : :other
-          raise InvalidPluralizationData.new(entry, count) unless entry.has_key?(key)
+          throw(:exception, I18n::InvalidPluralization.new(locale, entry, count)) unless entry.has_key?(key)
+#          raise InvalidPluralizationData.new(entry, count) unless entry.has_key?(key)
           entry[key]
         end
 
