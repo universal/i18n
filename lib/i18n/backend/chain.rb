@@ -39,9 +39,9 @@ module I18n
         def translate(locale, key, default_options = {})
           namespace = nil
           options = default_options.except(:default)
-
+          exception = nil
           backends.each do |backend|
-            catch(:exception) do
+            exception = catch(:exception) do
               options = default_options if backend == backends.last
               translation = backend.translate(locale, key, options)
               if namespace_lookup?(translation, options)
@@ -53,7 +53,7 @@ module I18n
           end
 
           return namespace if namespace
-          throw(:exception, I18n::MissingTranslation.new(locale, key, options))
+          throw(:exception, exception)
         end
 
         def exists?(locale, key)
